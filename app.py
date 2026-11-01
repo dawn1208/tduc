@@ -6,7 +6,7 @@ from langchain_core.messages import SystemMessage, HumanMessage
 # Cấu hình giao diện Streamlit
 st.set_page_config(page_title="EcoMind AI", page_icon="🌿", layout="centered")
 
-# CSS tùy chỉnh giao diện xanh tối giản, mượt mà
+# Giao diện xanh tối giản, mượt mà
 st.markdown("""
     <style>
     .stApp { background-color: #022c22; color: #f1f5f9; }
@@ -18,12 +18,20 @@ st.markdown("""
 st.title("🌿 EcoMind AI - Trợ lý Môi trường")
 st.markdown("Trợ lý AI chuyên biệt về năng lượng sạch, tái chế và biến đổi khí hậu.")
 
-# Kiểm tra API Key từ biến môi trường hoặc sidebar
-api_key = os.getenv("GEMINI_API_KEY")
+# Lấy API Key tự động từ Streamlit Secrets hoặc nhập thủ công
+api_key = None
+try:
+    api_key = st.secrets["GEMINI_API_KEY"]
+except Exception:
+    pass
+
+if not api_key:
+    api_key = os.getenv("GEMINI_API_KEY")
+
 if not api_key:
     api_key = st.sidebar.text_input("Nhập Gemini API Key của bạn:", type="password")
     if not api_key:
-        st.warning("⚠️ Vui lòng nhập Gemini API Key để tiếp tục sử dụng AI.")
+        st.warning("⚠️ Vui lòng cấu hình GEMINI_API_KEY trong Streamlit Secrets hoặc nhập khóa để tiếp tục.")
         st.stop()
 
 # Chọn tab chức năng
