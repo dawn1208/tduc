@@ -1,13 +1,27 @@
 ﻿import os
+import subprocess
+import sys
+
+# Tự động kiểm tra và cài đặt thư viện bắt buộc khi chạy trên Server
+def install_requirements():
+    packages = ["fastapi", "uvicorn", "langchain-google-genai", "pydantic", "python-dotenv"]
+    for package in packages:
+        try:
+            __import__(package.replace("-", "_"))
+        except ImportError:
+            subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+
+install_requirements()
+
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse, StreamingResponse
 from pydantic import BaseModel
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import SystemMessage, HumanMessage
 
-app = FastAPI(title="EcoMind AI All-in-One", version="1.0.0")
+app = FastAPI(title="EcoMind AI", version="1.0.0")
 
-# Strict Guardrail & Roles
+# Prompt phân vai & Ràng buộc chỉ trả lời Môi trường
 ROLES_PROMPTS = {
     "clean_energy": "Bạn là Kỹ sư Năng lượng Sạch. Bạn CHỈ trả lời các chủ đề về năng lượng tái tạo, pin mặt trời, điện gió và giảm phát thải.\n",
     "waste_recycling": "Bạn là Chuyên gia Tái chế Rác thải. Bạn CHỈ trả lời các vấn đề về phân loại rác, kinh tế tuần hoàn và giảm rác thải sinh hoạt.\n",
@@ -70,6 +84,7 @@ def serve_frontend():
     <html lang="vi">
     <head>
         <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>EcoMind AI - Trợ lý Môi trường</title>
         <script src="https://cdn.tailwindcss.com"></script>
     </head>
